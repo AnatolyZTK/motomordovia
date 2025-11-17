@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./:/var/www/html
+      - ./api:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
@@ -15,8 +15,7 @@ services:
 
   php:
     build:
-      context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     volumes:
       - ./:/var/www/html
       - ./docker/php/php.ini:/usr/local/etc/php/php.ini
@@ -24,7 +23,38 @@ services:
       - mysql
     networks:
       - symfony-network
-
+  frontend:
+    build:
+      dockerfile: docker/frontend/Dockerfile
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /nuxt
+    ports:
+      - ${FRONTEND_PORT:-3000}:3000
+      - ${FRONTEND_PORT2:-24678}:24678
+    command: sh init.sh
+#    frontend:
+#      build: ./frontend
+#      volumes:
+#        - type: bind
+#          source: ./frontend
+#          target: /nuxt
+#      ports:
+#        - ${FRONTEND_PORT:-3000}:3000
+#        - ${FRONTEND_PORT2:-24678}:24678
+#      command: sh init.sh
+#  frontend:
+#    build:
+#      dockerfile: docker/frontend/Dockerfile
+#      context: ./frontend
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#    ports:
+#      - ${FRONTEND_PORT:-3000}:3000
+#      - ${FRONTEND_PORT2:-24678}:24678
+#    command: yarn dev
   mysql:
     image: mysql:8.0
     environment:
