@@ -43,9 +43,9 @@ RUN addgroup -g 1000 app && adduser -u 1000 -G app -s /bin/sh -D app
 WORKDIR /var/www/html
 
 # Смена владельца файлов
-RUN chown -R app:app /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 
-USER app
+USER www-data
 
 EXPOSE 9000
 
